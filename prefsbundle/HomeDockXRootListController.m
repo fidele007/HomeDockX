@@ -1,4 +1,5 @@
 #include "HomeDockXRootListController.h"
+#import <spawn.h>
 
 @implementation HomeDockXRootListController
 
@@ -13,10 +14,9 @@
 - (void)respring {
 	CFPreferencesSynchronize(CFSTR("pw.ssnull.homedockx"), kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-	system("killall SpringBoard");
-#pragma GCC diagnostic pop
+	pid_t pid;
+	const char *args[] = {"killall", "-9", "backboardd", NULL};
+	posix_spawn(&pid, "/usr/bin/killall", NULL, NULL, (char *const *)args, NULL);
 }
 
 @end

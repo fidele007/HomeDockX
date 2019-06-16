@@ -26,7 +26,7 @@ long _homeButtonType = 1;
 	if (originalButton) {
 		originalButton = NO;
 		return %orig;
-	} 
+	}
     else {
 		return 2;
 	}
@@ -106,10 +106,12 @@ long _homeButtonType = 1;
         if (!_isDashboardActive) {
             UITouch *touch = [touches anyObject];
 
-            // do not do home gesture for 1/2 left of the screen if dock is enabled
-            if (!isSpringBoardAtFront && 
-                prefs.enableDock
-            ) {
+            // do not do home gesture for 1/2 left of the screen if dock is enabled and
+            // enable dock in app is enable
+            if (!isSpringBoardAtFront &&
+                prefs.enableDock &&
+                prefs.enableInAppDock)
+            {
                 BOOL reset = NO;
 
                 switch ([(SpringBoard*)[UIApplication sharedApplication] activeInterfaceOrientation]) {
@@ -134,8 +136,12 @@ long _homeButtonType = 1;
 
             // do not enable home gesture when using keyboard
             if (prefs.noKeyboard && isKeyboardVisible) {
-                resetTouch(self, touches, event);
-                return;
+                BOOL reset = [touch locationInView:touch.view].x >= touch.view.bounds.size.width / 4 &&
+                             [touch locationInView:touch.view].x <= touch.view.bounds.size.width * 3/4;
+                if (reset) {
+                    resetTouch(self, touches, event);
+                    return;
+                }
             }
         }
 
@@ -171,7 +177,7 @@ long _homeButtonType = 1;
 		return nil;
 	}
 }
-%end 
+%end
 
 // Restore screenshot shortcut
 %hook SpringBoard
